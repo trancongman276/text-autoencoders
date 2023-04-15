@@ -21,11 +21,17 @@ Download the processed Yelp and Yahoo datasets by running:
 ```
 bash download_data.sh
 ```
+## Cleaning
+```
+$ wget https://dumps.wikimedia.org/viwiki/latest/viwiki-latest-pages-articles.xml.bz2
+$ bzip2 -d viwiki-latest-pages-articles.xml.bz2
+$ python WikiExtractor.py --no-templates -s --lists viwiki-latest-pages-articles.xml -q -o - | perl -CSAD -Mutf8 cleaner.pl > viwiklatest.txt
+```
 
 ## Training
 The basic training command is:
 ```
-python train.py --train data/yelp/train.txt --valid data/yelp/valid.txt --model_type aae --lambda_adv 10 --noise 0.3,0,0,0 --save-dir checkpoints/yelp/daae
+python train.py --train data/yahoo/train.txt --valid data/yahoo/valid.txt --model_type aae --lambda_adv 10 --noise 0.3,0,0,0 --save-dir checkpoints/daae
 ```
 To train various models, use the following options:
 - AE: `--model_type dae --save-dir checkpoints/yelp/ae`
