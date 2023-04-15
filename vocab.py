@@ -1,4 +1,5 @@
 from collections import Counter
+import re
 
 class Vocab(object):
     def __init__(self, path):
@@ -20,9 +21,29 @@ class Vocab(object):
         self.nspecial = 5
 
     @staticmethod
+    def no_accent_vietnamese(s):
+        s = re.sub(r"[àáạảãâầấậẩẫăằắặẳẵ]", "a", s)
+        s = re.sub(r"[ÀÁẠẢÃĂẰẮẶẲẴÂẦẤẬẨẪ]", "A", s)
+        s = re.sub(r"[èéẹẻẽêềếệểễ]", "e", s)
+        s = re.sub(r"[ÈÉẸẺẼÊỀẾỆỂỄ]", "E", s)
+        s = re.sub(r"[òóọỏõôồốộổỗơờớợởỡ]", "o", s)
+        s = re.sub(r"[ÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠ]", "O", s)
+        s = re.sub(r"[ìíịỉĩ]", "i", s)
+        s = re.sub(r"[ÌÍỊỈĨ]", "I", s)
+        s = re.sub(r"[ùúụủũưừứựửữ]", "u", s)
+        s = re.sub(r"[ƯỪỨỰỬỮÙÚỤỦŨ]", "U", s)
+        s = re.sub(r"[ỳýỵỷỹ]", "y", s)
+        s = re.sub(r"[ỲÝỴỶỸ]", "Y", s)
+        s = re.sub(r"[Đ]", "D", s)
+        s = re.sub(r"[đ]", "d", s)
+        return s
+
+    @staticmethod
     def build(sents, path, size):
         v = ['<pad>', '<go>', '<eos>', '<unk>', '<blank>']
         words = [w for s in sents for w in s]
+        no_vnmese = [Vocab.no_accent_vietnamese(w) for w in words]
+        words = list(set(words + no_vnmese))
         cnt = Counter(words)
         n_unk = len(words)
         for w, c in cnt.most_common(size):
@@ -30,6 +51,6 @@ class Vocab(object):
             n_unk -= c
         cnt['<unk>'] = n_unk
 
-        with open(path, 'w') as f:
+        with open(path, 'w', encoding="utf8") as f:
             for w in v:
                 f.write('{}\t{}\n'.format(w, cnt[w]))

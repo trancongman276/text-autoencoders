@@ -13,7 +13,7 @@ def strip_eos(sents):
 
 def load_sent(path):
     sents = []
-    with open(path) as f:
+    with open(path, encoding="utf8") as f:
         for line in f:
             sents.append(line.split())
     return sents
